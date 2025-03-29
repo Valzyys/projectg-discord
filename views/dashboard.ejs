@@ -1,0 +1,266 @@
+<!-- views/dashboard.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discord Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      background-color: #36393f;
+      color: #dcddde;
+    }
+    .sidebar {
+      background-color: #2f3136;
+      width: 240px;
+    }
+    .content {
+      background-color: #36393f;
+    }
+    .server-icon {
+      background-color: #4f545c;
+      transition: all 0.2s;
+    }
+    .server-icon:hover {
+      background-color: #5865F2;
+      border-radius: 15px;
+    }
+    .user-card {
+      background-color: #2f3136;
+    }
+    .friend-item {
+      background-color: #2f3136;
+      transition: all 0.2s;
+    }
+    .friend-item:hover {
+      background-color: #393c43;
+    }
+    .server-item {
+      transition: all 0.2s;
+    }
+    .server-item:hover {
+      background-color: #393c43;
+    }
+    .tab-btn {
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background-color: #393c43;
+      color: white;
+    }
+    .tab-btn:hover:not(.active) {
+      background-color: #4f545c;
+    }
+  </style>
+</head>
+<body>
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="sidebar flex flex-col flex-shrink-0 h-full">
+      <div class="p-4 border-b border-gray-700">
+        <h1 class="text-xl font-bold text-white">DiscordConnect</h1>
+      </div>
+      
+      <!-- User Profile Summary -->
+      <div class="p-4">
+        <div class="flex items-center">
+          <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+            <% if (user.avatar) { %>
+              <img src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>.png" alt="Avatar" class="w-full h-full object-cover">
+            <% } else { %>
+              <div class="w-full h-full bg-gray-600 flex items-center justify-center">
+                <span class="text-lg font-bold"><%= user.username.charAt(0).toUpperCase() %></span>
+              </div>
+            <% } %>
+          </div>
+          <div>
+            <h2 class="font-semibold"><%= user.username %></h2>
+            <p class="text-xs text-gray-400">#<%= user.discriminator || '0000' %></p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Navigation -->
+      <div class="p-4 flex-1">
+        <nav>
+          <button class="tab-btn active w-full text-left px-3 py-2 rounded mb-1 flex items-center" onclick="showTab('profile')">
+            <i class="fas fa-user mr-2"></i> Profile
+          </button>
+          <button class="tab-btn w-full text-left px-3 py-2 rounded mb-1 flex items-center" onclick="showTab('servers')">
+            <i class="fas fa-server mr-2"></i> Servers
+          </button>
+          <button class="tab-btn w-full text-left px-3 py-2 rounded mb-1 flex items-center" onclick="showTab('friends')">
+            <i class="fas fa-users mr-2"></i> Friends
+          </button>
+        </nav>
+      </div>
+      
+      <!-- Logout Button -->
+      <div class="p-4 border-t border-gray-700">
+        <a href="/logout" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded flex items-center justify-center">
+          <i class="fas fa-sign-out-alt mr-2"></i> Logout
+        </a>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="content flex-1 overflow-auto">
+      <!-- Profile Tab -->
+      <div id="profile-tab" class="tab-content p-6">
+        <h2 class="text-2xl font-bold mb-6">Your Profile</h2>
+        
+        <div class="user-card rounded-lg p-6 max-w-2xl">
+          <div class="flex items-start">
+            <div class="w-24 h-24 rounded-full overflow-hidden mr-6">
+              <% if (user.avatar) { %>
+                <img src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>.png" alt="Avatar" class="w-full h-full object-cover">
+              <% } else { %>
+                <div class="w-full h-full bg-gray-600 flex items-center justify-center">
+                  <span class="text-3xl font-bold"><%= user.username.charAt(0).toUpperCase() %></span>
+                </div>
+              <% } %>
+            </div>
+            
+            <div>
+              <div class="flex items-baseline mb-1">
+                <h3 class="text-xl font-bold"><%= user.username %></h3>
+                <span class="ml-1 text-gray-400">#<%= user.discriminator || '0000' %></span>
+              </div>
+              
+              <div class="mb-4">
+                <div class="text-sm text-gray-400 mb-1">Discord ID</div>
+                <div><%= user.id %></div>
+              </div>
+              
+              <div>
+                <div class="text-sm text-gray-400 mb-1">Bio</div>
+                <div class="text-gray-300"><%= user.bio || 'No bio set' %></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-6 grid grid-cols-2 gap-4">
+            <div>
+              <div class="text-sm text-gray-400 mb-1">Servers</div>
+              <div class="text-xl font-semibold"><%= user.guilds ? user.guilds.length : 0 %></div>
+            </div>
+            
+            <div>
+              <div class="text-sm text-gray-400 mb-1">Friends</div>
+              <div class="text-xl font-semibold"><%= user.relationships ? user.relationships.length : 0 %></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Servers Tab -->
+      <div id="servers-tab" class="tab-content p-6 hidden">
+        <h2 class="text-2xl font-bold mb-6">Your Servers</h2>
+        
+        <% if (user.guilds && user.guilds.length > 0) { %>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <% user.guilds.forEach(guild => { %>
+              <div class="server-item rounded-lg p-4 bg-gray-800 flex items-center">
+                <div class="server-icon w-12 h-12 rounded-full flex items-center justify-center mr-4">
+                  <% if (guild.icon) { %>
+                    <img src="https://cdn.discordapp.com/icons/<%= guild.id %>/<%= guild.icon %>.png" alt="<%= guild.name %>" class="w-full h-full rounded-full object-cover">
+                  <% } else { %>
+                    <span class="text-lg font-bold"><%= guild.name.charAt(0).toUpperCase() %></span>
+                  <% } %>
+                </div>
+                
+                <div>
+                  <h3 class="font-semibold"><%= guild.name %></h3>
+                  <% if (guild.owner) { %>
+                    <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">Owner</span>
+                  <% } %>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="bg-gray-800 rounded-lg p-6 text-center">
+            <p>No servers found or permissions to view servers not granted.</p>
+          </div>
+        <% } %>
+      </div>
+      
+      <!-- Friends Tab -->
+      <div id="friends-tab" class="tab-content p-6 hidden">
+        <h2 class="text-2xl font-bold mb-6">Your Friends</h2>
+        
+        <% if (user.relationships && user.relationships.length > 0) { %>
+          <div class="space-y-2">
+            <% user.relationships.forEach(friend => { %>
+              <div class="friend-item rounded-lg p-3 flex items-center">
+                <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                  <% if (friend.avatar) { %>
+                    <img src="https://cdn.discordapp.com/avatars/<%= friend.id %>/<%= friend.avatar %>.png" alt="Avatar" class="w-full h-full object-cover">
+                  <% } else { %>
+                    <div class="w-full h-full bg-gray-600 flex items-center justify-center">
+                      <span class="text-lg font-bold"><%= friend.username ? friend.username.charAt(0).toUpperCase() : '?' %></span>
+                    </div>
+                  <% } %>
+                </div>
+                
+                <div>
+                  <div class="flex items-baseline">
+                    <h3 class="font-semibold"><%= friend.username || 'Unknown User' %></h3>
+                    <% if (friend.discriminator) { %>
+                      <span class="ml-1 text-gray-400">#<%= friend.discriminator %></span>
+                    <% } %>
+                  </div>
+                  
+                  <% if (friend.status) { %>
+                    <p class="text-xs text-gray-400">
+                      <% if (friend.status === 'online') { %>
+                        <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span> Online
+                      <% } else if (friend.status === 'idle') { %>
+                        <span class="inline-block w-2 h-2 rounded-full bg-yellow-500 mr-1"></span> Idle
+                      <% } else if (friend.status === 'dnd') { %>
+                        <span class="inline-block w-2 h-2 rounded-full bg-red-500 mr-1"></span> Do Not Disturb
+                      <% } else { %>
+                        <span class="inline-block w-2 h-2 rounded-full bg-gray-500 mr-1"></span> Offline
+                      <% } %>
+                    </p>
+                  <% } %>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="bg-gray-800 rounded-lg p-6 text-center">
+            <p>No friends found or permissions to view friends not granted.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function showTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.add('hidden');
+      });
+      
+      // Remove active class from all tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Show the selected tab
+      document.getElementById(tabName + '-tab').classList.remove('hidden');
+      
+      // Add active class to the clicked button
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.textContent.trim().toLowerCase().includes(tabName)) {
+          btn.classList.add('active');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
